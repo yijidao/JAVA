@@ -2,8 +2,6 @@ package org.wzp.chapter3;
 
 import java.util.concurrent.locks.*;
 
-import com.sun.management.jmx.Trace;
-
 /**
  * 一个使用ReentrantLock 的 中断解决死锁案例
  * @author wzp
