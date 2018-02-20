@@ -4,7 +4,8 @@ import java.util.Random;
 import java.util.concurrent.locks.*;
 
 /**
- * 读写锁 DEMO
+ * 读写锁 DEMO，synchronized 和 ReentrantLock 都是串行的，所以此程序使用普通锁，会花费20S
+ * 读写锁：读不阻塞，写会阻塞，所以，此程序使用读写锁，会花费2S多一点的时间（2s写+18个线程同事读的时间）
  * @author wzp
  * @date: 2018年2月21日 上午12:30:09 
  *
@@ -19,7 +20,7 @@ public class ReadWriteLockDemo {
 	public int handleRead(Lock lock) throws InterruptedException {
 		try {
 			lock.lock();
-			Thread.sleep(1000);
+			Thread.sleep(1000); // 模拟读操作
 			return value;
 		} finally {
 			lock.unlock();
@@ -29,7 +30,7 @@ public class ReadWriteLockDemo {
 	public void handleWrite(Lock lock, int index) throws InterruptedException {
 		try {
 			lock.lock();
-			Thread.sleep(1000);
+			Thread.sleep(1000); // 模拟写操作
 			this.value = index;
 		} finally {
 			lock.unlock();
