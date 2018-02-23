@@ -1,0 +1,141 @@
+--基础概念
+1.  Synchronous(同步) 和 Asynchronous(异步)
+	通常指方法调用，Synchronous 方法需要等方法完成才能结束，而 Asynchronous 方法执行完立刻结束，而真实的返回结果需要等另一个真实执行的线程结束后才返回
+2.  Concurrency(并发) 和 Parallelism(并行)
+   	Concurrency 指多个任务交替执行，Paralleilism 指多个任务同时执行
+3.  临界区
+	通常指一种公共资源或者共享数据，可以被多个线程使用，但是，一次只能有一个线程使用
+4.	Blocking(阻塞) 和 Non-Blocking(非阻塞)
+	通常指线程之间的互相影响。Blocking ：一个线程占用了临界区资源，那么其他线程就必须挂起等待，这就是阻塞
+5.	Deadlock(死锁)、Starvation(饥饿) 和 Livelock(活锁)
+	这几个问题都是线程活跃性之间的问题
+	Deadlock 是指几个线程都互相占用对方的临界区资源而不释放
+	Starvation 是指线程迟迟无法获得所需要的临界区资源，可能是因为优先级太低导致所需要的资源一直被高优先级的线程所抢占
+	Livelock 是指几个线程主动释放资源给其他线程，导致资源在几个线程间跳动，而没有一个线程能同时获得所有资源
+--并发级别
+1.	Blocking
+	当使用 Synchronized 关键字和重入锁时，这个线程就是阻塞的。Blocking 的线程在执行后续代码前，都会尝试获得临界区的 Lock，如果得不到，就会挂起等待
+2.	Starvation-Free(无饥饿)
+	就是指公平锁和非公平锁，非公平锁高优先级的线程可以获取临界区资源，而低优先级则不行，公平锁则无论优先级高低，都得排队
+3.	Obstruction-Free(无障碍)
+	Obstruction-Free 是最弱的非阻塞调度，就是乐观锁，是指所有线程都可以获得临界区资源，同时维护一个“一致性标志”，一旦一致性标志被修改，就代表存在冲突，就进行回滚。有时候会出现一种情况，就是几个线程一直回滚，都不能完成操作，走出临界区
+	Blocking 就是悲观锁，以保护共享数据为第一策略
+4.	Lock-Free(无锁)
+	无锁的并行都是无障碍的，但是不同的是，无锁的并发保证，必然有一个线程能在有限步内完成操作，但是有时会引起饥饿问题。
+	Lock-Free 一个典型的特点就是包含一个无穷循环，在这个循环中，如果没有冲突，则程序退出，否则则继续尝试修改。
+5. Wait-Free(无等待)
+	Lock-Free 要求一个线程在有限步数内完成，而 Wait-Free 要求所有线程都要在有线步数内完成
+--有关并行的两个中药规律
+1.	加速比定义：加速比 = 优化前系统耗时/优化后系统耗时
+2. Amdual 定律
+	加速比定义：加速比 = 优化前系统耗时/优化后系统耗时
+	Tn = T1 (F + (1 - F) / n) Tn：n个CPU优化后的耗时，T1：一个CPU处理的耗时(优化前耗时)，n：CPU数量，F：串行比例，(1 - F)：并行比例
+	加速比 = T1 / Tn = 1 / (F + (1 - F) / n) 当CPU为无穷时， 加速比 = 1 / F
+3. Gustafson 定律
+--线程基本知识
+1.	Thread(线程) 与 Process(进程)
+	进程是线程的容器，线程是轻量级进程，是程序的最小执行单位
+2.	Thread 的生命周期
+	NEW -> RUNNABLE(BLOCKING, WAITIND, TIMED_WAITING) -> TERMINATED(终止)
+	线程所有状态都在 Thread 中的 State 枚举中
+--线程基本操作
+1.	初始化线程
+	1) 继承 Thread 类，重载 run 方法
+	Thread t1 = new Thread()
+	{
+		@override
+		public void run()
+		{
+			System.out.println("hello");
+		}
+	}
+	t1.start();
+	2) 实现 Runnable 接口，显示 run 方法，将其传入 Thread(Runnable target)
+2.	线程终止
+	一般线程执行完毕就会停止，不需要手动关闭。也可以使用 stop() 这个方法，但是 stop() 过于暴力，会把执行中的线程强制停止，导致数据不一致。
+	要避免这种现象。可以使用标志位 boolean stopme = false; 来停止线程。
+	public void run()
+	{
+		while(true)
+		{
+			if(stopme)
+			{
+				break; // 通过 break 跳出循环，终止线程，而不是通过 stop()
+			}
+			synchronized (u)
+			{
+				// TODO
+			}
+			Thread.yield();
+		}
+	}
+3.	线程中断
+	public void Thread.interrupt() // 中断线程
+	public boolean Thread.isInterrupt() // 判断是否被中断
+	public static boolean Thread.interrupted() // 判断是否被中断，并清除当前中断状态
+	上面三个方法只是对线程置一个中断标志，需要写具体的逻辑才能真正实现中断
+	
+	public static native void sleep(long millis) throws InterruptException{}
+	Thread.sleep() 会让线程休眠一段时间，并且可以抛出一个 InterruptException 中断异常。
+	当线程休眠时，被置上中断标志位，这个异常就会产生。
+4.	wait(等待)和notify(通知)
+	方法签名如下
+	public final void wait() throws InterruptedException // 必须包含在 synchronized 块
+	public final void notify() // 随机唤醒
+	public final void notifyAll() // 全部唤醒
+	wait、notify 和 notifyAll 都是 Object 下的方法，而不是 Thread 下的方法
+	三个方法都需要取得对象的监视器才能执行
+	wait 会释放锁，而 sleep 不会释放
+5.	suspend(挂起)和resume(继续执行)线程
+	这两个方法已经被废弃，不推荐使用。不推荐使用 suspend 的原因是因为 suspend 去挂起线程的时候，不会释放锁，从而会影响到其他线程正常使用临界区资源
+	可以使用 wait 和 notify 去实现 suspend 和 resume 的功能
+6.	join(等待线程结束)和yield(谦让)
+	签名如下
+	public final void join() throws InterruptedException
+	public final void join(long millis) throws InterruptedException
+	public static native void yield()
+	yield 一旦执行就会让出CPU资源，但是，让出CPU不代表线程不执行了，线程让出CPU后，会重新加入对CPU的争夺。当一个线程不是那么重要，又担心占用太多资源的时候，可以使用 yield()
+7.	volatile
+	用于保证线程的原子性，有序性，和可见性
+	这个关键字会告诉虚拟机，被修饰的变量需要小心处理，因此虚拟机会对其进行优化
+	一般用于long等
+8.	线程组
+	ThreadGroup tg = new ThreadGroup("GroupName");
+	Thread t1 = new Thread(tg, new 线程对象，"T1");
+	Thread t2 = new Thread(tg, new 线程对象，"T2");
+9.	驻守后台(Daemon)
+	Thread t1 = new DeamonT();
+	t1.setDeamon();
+	t1.start();
+	start 必须在 setDeamon 之后
+10.	线程优先级(priority)
+	Java 中用 1-10 表示线程优先级，内置三个静态变量
+	public final static int MIN_PRIORITY = 1;
+	public final static int NORM_PRIORITY = 5;
+	public final static int MAX_PRIORITY = 10;
+
+	Thread high = new HighPriority();
+	Thread low = new LowPriority();
+	high.setPriority(Thread.MAX_PRIORITY);
+	low.setPriority(Thread.MIN_PRIORITY);
+11.	synchronized
+	一般有三种用法：
+	· 指定加锁对象：对给定对象加锁，进入同步代码前要获得给定对象的锁
+	· 直接作用于实例方法：相当于给当前实例加锁，进入同步代码前要获得当前实例的锁
+	· 直接作用于静态方法：相当于给当前类加锁，进入同步代码前要获得当前类的锁
+12. 一些隐蔽的错误
+	· int 类型等长度超过
+	· ArrayList 是一个不安全的容器，用多线程操作时，会出现三种情况，a,数据正常，b,数组越界，原因是扩容过程中，一致性遭到了破坏,c,数据偏小，可以使用 Vector 代替
+	· HashMap 是一个线程不安全的容器，可以使用ConcurrentHashMap 代替
+--JDK并发包
+1.	同步控制（即加锁），synchronized(同步) 和 ReentrantLock(重入锁)
+2.	ReentrantLock(重入锁)
+	ReentrantLock lock = new ReentrantLock();
+	lock.lock();
+	lock.unlock();
+	· 可以重复加锁，也可以重复解锁 lock.lock(); lock.unlock();
+	· 可以发现中断 lock.lockInterruptibly();
+	· 锁申请等待限时 lock.tryLock(5, TimeUnit.Seconds)
+	· tryLock() 尝试获得锁，如果成功，返回true，失败则返回false，该方法不等待，立即返回
+	. 公平锁(fair Lock) public ReentrantLock(boolean fair) // 为 true 就表示为公平锁
+3.	重入锁的好搭档：Condition 条件
