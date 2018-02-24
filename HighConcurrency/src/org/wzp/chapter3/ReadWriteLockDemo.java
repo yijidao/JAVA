@@ -11,7 +11,6 @@ import java.util.concurrent.locks.*;
  *
  */
 public class ReadWriteLockDemo {
-	private static Lock lock = new ReentrantLock();
 	private static ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 	private static Lock readLock = readWriteLock.readLock();
 	private static Lock writeLock = readWriteLock.writeLock();
