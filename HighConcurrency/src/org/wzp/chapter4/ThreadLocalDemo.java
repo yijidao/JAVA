@@ -5,7 +5,12 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
+/**
+ * ThreadLocal Demo
+ * @author wzp
+ * @date: 2018年2月24日 下午12:01:56 
+ *
+ */
 public class ThreadLocalDemo {
 //	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:SS");
 	static ThreadLocal<SimpleDateFormat> t1 = new ThreadLocal<SimpleDateFormat>();
