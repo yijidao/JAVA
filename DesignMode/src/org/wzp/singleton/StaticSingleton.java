@@ -25,5 +25,6 @@ public class StaticSingleton {
 		if(s1 == s2) {
 			System.out.println("--引用相同");
 		}
+
 	}
 }
