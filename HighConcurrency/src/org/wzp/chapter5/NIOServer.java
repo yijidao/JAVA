@@ -1,6 +1,5 @@
 package org.wzp.chapter5;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -11,15 +10,18 @@ import java.util.concurrent.*;
 
 /**
  * 基于 NIO 的Socket 服务器
+ * 基于 NIO 的Socket 服务器，核心就是一个 selector(使用轮训的方式) 管理多个 selectable Channel
+ * 使用一个线程去管理 selector，事件触发后，再新建线程去执行对应 channel 的操作
+ * 这样的好处就是可以形成了一个使用一个或者极少数线程，去处理大量客户端连接的结构(注意：这一个只是处理客户端连接) 
  * @author wzp
  * @date: 2018年3月4日 下午3:59:30 
  *
  */
 public class NIOServer {
-	private Selector selector; 
-	private ExecutorService tp = Executors.newCachedThreadPool();
-	public static Map<Socket, Long> time_stat = new HashMap<Socket, Long>(10240);
-	private void startServer() throws Exception {
+	private static Selector selector; 
+	private static ExecutorService tp = Executors.newCachedThreadPool();
+	public static Map<Socket, Long> time_stat = new HashMap<Socket, Long>(10240); // 用来计时
+	private static void startServer() throws Exception {
 		selector = SelectorProvider.provider().openSelector();
 		ServerSocketChannel ssc = ServerSocketChannel.open(); // 表示服务端的 SocketChannel 实例
 		ssc.configureBlocking(false); // 非阻塞模式
@@ -31,8 +33,8 @@ public class NIOServer {
 		// 等待分发网络消息
 		for(;;) {
 			selector.select(); // select() 是一个阻塞的方法，如果没有任何数据准备好，就阻塞；如果准备好了，就返回SelectKey 的数量
-			Set readyKeys = selector.selectedKeys();
-			Iterator i = readyKeys.iterator();
+			Set<SelectionKey> readyKeys = selector.selectedKeys(); // selectedKeys 返回所有的SelectionKey,所以这里用Set
+			Iterator<SelectionKey> i = readyKeys.iterator();
 			long e = 0;
 			while(i.hasNext()) {
 				SelectionKey sk = (SelectionKey) i.next();
@@ -57,7 +59,7 @@ public class NIOServer {
 		}
 	}
 	
-	private void doAccept(SelectionKey sk) {
+	private static void doAccept(SelectionKey sk) {
 		ServerSocketChannel server = (ServerSocketChannel) sk.channel();
 		SocketChannel clientChannel;
 		try {
@@ -77,7 +79,7 @@ public class NIOServer {
 		}
 	}
 	
-	private void doRead(SelectionKey sk) {
+	private static void doRead(SelectionKey sk) {
 		SocketChannel channel = (SocketChannel) sk.channel();
 		ByteBuffer bb = ByteBuffer.allocate(8192);
 		int len;
@@ -99,7 +101,7 @@ public class NIOServer {
 		tp.execute(new HandleMsg(sk, bb));
 	}
 	
-	private void doWrite(SelectionKey sk) {
+	private static void doWrite(SelectionKey sk) {
 		SocketChannel channel = (SocketChannel) sk.channel();
 		EchoClient echoClient = (EchoClient) sk.attachment();
 		LinkedList<ByteBuffer> outq = echoClient.getOutputQueue();
@@ -125,7 +127,7 @@ public class NIOServer {
 		}
 	}
 	
-	private void disconnect(SelectionKey sk) {
+	private static void disconnect(SelectionKey sk) {
 		SocketChannel channel = (SocketChannel) sk.channel();
 		try {
 			channel.close();
@@ -134,7 +136,7 @@ public class NIOServer {
 		}
 	}
 	
-	class EchoClient {
+	static class EchoClient {
 		private LinkedList<ByteBuffer> outq;
 		public EchoClient() {
 			outq = new LinkedList<ByteBuffer>();
@@ -147,7 +149,7 @@ public class NIOServer {
 		}
 	}
 	
-	class HandleMsg implements Runnable{
+	static class HandleMsg implements Runnable{
 		SelectionKey sk;
 		ByteBuffer bb;
 		public HandleMsg(SelectionKey sk, ByteBuffer bb) {
@@ -161,6 +163,9 @@ public class NIOServer {
 			sk.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
 			selector.wakeup();
 		}
-		
+	}
+	
+	public static void main(String[] args) throws Exception {
+		startServer();
 	}
 }
