@@ -1,11 +1,14 @@
 package org.wzp.chapter1;
+
+import java.util.Iterator;
+
 /**
  * 链表实现的下压栈
  * @author wzp
  * @date: 2018年3月7日 下午11:31:38 
  *
  */
-public class NodeStack<Item> {
+public class NodeStack<Item> implements Iterable<Item> {
 	private int N;
 	private Node first; // 栈顶，最近添加的元素
 	
@@ -41,5 +44,27 @@ public class NodeStack<Item> {
 		first = first.next;
 		N--;
 		return item;
+	}
+
+	@Override
+	public Iterator<Item> iterator() {
+
+		return null;
+	}
+	
+	private class ListIterator implements Iterator<Item>{
+		private Node current;
+		@Override
+		public boolean hasNext() {
+			return current != null;
+		}
+
+		@Override
+		public Item next() {
+			Item item = current.item;
+			current = current.next;
+			return item;
+		}
+		
 	}
 }
