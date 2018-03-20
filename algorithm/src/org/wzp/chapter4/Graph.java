@@ -33,10 +33,18 @@ public class Graph {
 		}
 	}
 	
+	/**
+	 * 返回边数
+	 * @return
+	 */
 	public int E() {
 		return E;
 	}
 	
+	/**
+	 * 返回顶点数
+	 * @return
+	 */
 	public int V() {
 		return V;
 	}
@@ -52,4 +60,12 @@ public class Graph {
 		E++;
 	}
 	
+	/**
+	 * 返回数组某个索引内的整条链表
+	 * @param v
+	 * @return
+	 */
+	public Iterable<Integer> adj(int v){
+		return adj[v];
+	}
 }
