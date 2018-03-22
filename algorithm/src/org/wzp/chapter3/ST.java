@@ -49,7 +49,7 @@ public class ST<Key, Value> {
 		return st.size();
 	}
 	
-	Iterable<Key> keys(){
+	public Iterable<Key> keys(){
 		return st.keySet();
 	}
 	
