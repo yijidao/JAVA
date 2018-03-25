@@ -28,16 +28,27 @@ public class Digraph {
 	public int E() {
 		return E;
 	}
-	
+	/**
+	 * 向有向图添加一条边 v -> w
+	 * @param v
+	 * @param w
+	 */
 	public void addEdge(int v, int w) {
 		adj[v].add(w);
 		E++;
 	}
-	
+	/**
+	 * 由 v 指出的边所连接的所有顶点
+	 * @param v
+	 * @return
+	 */
 	public Iterable<Integer> adj(int v){
 		return adj[v];
 	}
-	
+	/**
+	 * 返回有向图的副本，并将其中所有的方向反转
+	 * @return
+	 */
 	public Digraph reverse() {
 		Digraph R = new Digraph(V);
 		for(int v = 0; v < V; v++) {
