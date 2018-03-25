@@ -18,7 +18,7 @@ public class DepthFirstOrder {
 	private NodeQueue<Integer> post; // 后序排序队列
 	private NodeStack<Integer> reversePost; // 逆后序排序堆栈
 	
-	public DepthFirstOrder(Graph G) {
+	public DepthFirstOrder(Digraph G) {
 		pre = new NodeQueue<Integer>();
 		post = new NodeQueue<Integer>();
 		reversePost = new NodeStack<Integer>();
@@ -29,7 +29,7 @@ public class DepthFirstOrder {
 		}
 	}
 	
-	private void dfs(Graph G, int v) {
+	private void dfs(Digraph G, int v) {
 		pre.enqueue(v);
 		marked[v] = true;
 		for(int w : G.adj(v))
