@@ -70,7 +70,10 @@ public class MinPQ<Key> implements Iterable<Key> {
 		pq[++n] = x;
 		swim(n);
 	}
-	
+	/**
+	 * 删除并返回最小结点
+	 * @return
+	 */
 	public Key delMin() {
 		Key min = pq[1];
 		exch(1, n--);
