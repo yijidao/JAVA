@@ -1,0 +1,17 @@
+html,body
+{
+	margin: 0px;
+	padding: 0px;
+	background-color: #DAF7A6;
+}
+
+#login
+{
+	position: absolute;
+	left: 50%;
+	top: 20%;
+	
+	width: 300px;
+	transform: translate(-150px, 0px);
+
+}
