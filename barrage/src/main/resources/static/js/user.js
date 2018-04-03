@@ -10,7 +10,7 @@ $(function(){
 		if(num>0){ 
 			name=arr[i].substring(0,num);
 			value=arr[i].substr(num+1);
-			$('#welcome').html("欢迎您，用户："+value);
+			$('#welcome').html("欢迎您，用户："+name);
 		} 
 	} 
 });
