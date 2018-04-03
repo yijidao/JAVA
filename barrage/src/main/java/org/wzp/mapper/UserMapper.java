@@ -3,6 +3,7 @@ package org.wzp.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Component;
 import org.wzp.model.User;
 
 public interface UserMapper {

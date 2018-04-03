@@ -1,0 +1,19 @@
+html,body
+{
+	margin: 0px;
+	padding: 0px;
+}
+
+#barrage
+{
+	width: 400px;
+	height: 800px;
+	padding: 30px;
+}
+#content
+{
+	border: solid 1px #2E86C1;
+	width: 400px;
+	height: 700px;
+	overflow:auto;
+}

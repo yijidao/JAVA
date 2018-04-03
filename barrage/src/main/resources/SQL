@@ -4,6 +4,10 @@ CREATE TABLE users
 (
 	id INT UNSIGNED AUTO_INCREMENT,
 	username VARCHAR(100) NOT NULL,
-	password VARCHAT(100) NOT NULL,
+	password VARCHAR(100) NOT NULL,
+	UNIQUE KEY uk_username (username),
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO users (username, password)
+VALUES('root', 'root')
